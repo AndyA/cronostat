@@ -31,7 +31,7 @@ sub mk_merge_iter {
   }
 
   return sub {
-    @iter = sort { $a->[0] <=> $b->[0] } @iter;
+    @iter = sort { DateTime->compare( $a->[0][0], $b->[0][0] ) } @iter;
     my $nv = $iter[0][0];
     $iter[0][0] = $iter[0][1]->();
     return $nv;
