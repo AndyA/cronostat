@@ -17,9 +17,17 @@ while (<>) {
 }
 
 my $ii = mk_merge_iter(@ct);
-for ( 1 .. 40 ) {
+while () {
+  my $now = time;
   my ( $ts, $verb ) = @{ $ii->() };
-  print "$ts, $verb\n";
+  my $then = $ts->epoch;
+  if ( $then > $now ) {
+    my $wait = $then - $now;
+    print "(sleeping $wait seconds)\n";
+    sleep $wait;
+  }
+  my $lt = localtime;
+  print "[$lt] $ts: $verb\n";
 }
 
 sub mk_merge_iter {
