@@ -13,13 +13,14 @@ int crono_field_init(crono_field *cf, int min, int max) {
 }
 
 int crono_field_add(crono_field *cf, int pos) {
+  if (pos < cf->min || pos > cf->max) return -1;
   cf->set |= BIT(pos);
   return 0;
 }
 
 int crono_field_add_range(crono_field *cf, int min, int max, int step) {
   for (int i = min; i <= max; i += step)
-    crono_field_add(cf, i);
+    if (crono_field_add(cf, i)) return -1;
   return 0;
 }
 
