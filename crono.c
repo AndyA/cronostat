@@ -110,6 +110,7 @@ int crono_schedule_init(crono_schedule *cs) {
   crono_field_init(&cs->f[crono_DAY], 1, 31);
   crono_field_init(&cs->f[crono_MONTH], 1, 12);
   crono_field_init(&cs->f[crono_YEAR], 0, 0);
+  crono_field_init(&cs->f[crono_WEEK_DAY], 1, 7);
   return 0;
 }
 
