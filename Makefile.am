@@ -11,8 +11,8 @@ include_HEADERS = crono.h
 bin_PROGRAMS = crono
 
 libcrono_la_SOURCES = \
-	crono.c crono.h
-	utils.c utils.h
+	crono.c crono.h \
+	parse.c
 
 libcrono_la_LDFLAGS = -avoid-version
 
