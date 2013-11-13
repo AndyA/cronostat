@@ -23,11 +23,6 @@ int crono_field_add_range(crono_field *cf, int min, int max, int step) {
   return 0;
 }
 
-int crono_field_remove(crono_field *cf, int pos) {
-  cf->set &= ~BIT(pos);
-  return 0;
-}
-
 int crono_field_size(const crono_field *cf) {
   int size = 0;
   for (int i = cf->min; i <= cf->max; i++) {
