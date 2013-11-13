@@ -1,4 +1,4 @@
-TESTBIN = basic
+TESTBIN = basic crono
 
 noinst_PROGRAMS = wrap $(TESTBIN)
 

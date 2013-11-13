@@ -26,28 +26,29 @@ extern "C" {
     crono_field f[crono_FIELDS];
   } crono_schedule;
 
+  int crono_field_init(crono_field *cf, int min, int max);
+  int crono_field_add(crono_field *cf, int pos);
+  int crono_field_remove(crono_field *cf, int pos);
+  int crono_field_add_range(crono_field *cf, int min, int max, int step);
   int crono_field_size(const crono_field *cf);
   int crono_field_prev(crono_field *cf);
   int crono_field_next(crono_field *cf);
+  int crono_field_snapped(const crono_field *cf);
+  int crono_field_snap_prev(crono_field *cf);
+  int crono_field_snap_next(crono_field *cf);
+  int crono_field_reset(crono_field *cf);
+
+  int crono_schedule_init(crono_schedule *cs);
+
+  int crono_schedule_get(const crono_schedule *cs, struct tm *tm);
+  int crono_schedule_set(crono_schedule *cs, const struct tm *tm);
+
+  int crono_schedule_snapped(const crono_schedule *cs);
+  int crono_schedule_snap_next(crono_schedule *cs);
+  int crono_schedule_snap_prev(crono_schedule *cs);
 
   int crono_schedule_prev(crono_schedule *cs);
   int crono_schedule_next(crono_schedule *cs);
-
-#if 0
-  struct tm {
-    int tm_sec;         /* seconds */
-    int tm_min;         /* minutes */
-    int tm_hour;        /* hours */
-    int tm_mday;        /* day of the month */
-    int tm_mon;         /* month */
-    int tm_year;        /* year */
-    int tm_wday;        /* day of the week */
-    int tm_yday;        /* day in the year */
-    int tm_isdst;       /* daylight saving time */
-  };
-#endif
-
-  int crono_schedule_get(const crono_schedule *cs, struct tm *tm);
 
 #ifdef __cplusplus
 }
