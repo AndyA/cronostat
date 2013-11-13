@@ -49,6 +49,10 @@ extern "C" {
   int crono_schedule_prev(crono_schedule *cs);
   int crono_schedule_next(crono_schedule *cs);
 
+  int crono_schedule_valid(const crono_schedule *cs);
+  int crono_schedule_prev_valid(crono_schedule *cs);
+  int crono_schedule_next_valid(crono_schedule *cs);
+
 #ifdef __cplusplus
 }
 #endif

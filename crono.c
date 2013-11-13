@@ -184,5 +184,83 @@ int crono_schedule_next(crono_schedule *cs) {
   return crono__schedule_next(cs, 0);
 }
 
+static int is_leap(int year) {
+  if (year % 400 == 0) return 1;
+  if (year % 100 == 0) return 0;
+  if (year %   4 == 0) return 1;
+  return 0;
+}
+
+static int month_days(int month, int year) {
+  static int mday[] = { -1, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+  if (month == 2 && is_leap(year)) return 29;
+  if (month >= 1 && month <= 12) return mday[month];
+  return -1;
+}
+
+static int valid_date(int day, int month, int year) {
+  if (month < 1 || month > 12) return 0;
+  if (day < 1 || day > month_days(month, year)) return 0;
+  return 1;
+}
+
+static int week_day(int day, int month, int year) {
+  struct tm tm;
+
+  tm.tm_sec = 0;
+  tm.tm_min = 0;
+  tm.tm_hour = 0;
+  tm.tm_mday = day;
+  tm.tm_mon = month;
+  tm.tm_year = year;
+  tm.tm_isdst = -1;
+
+  mktime(&tm);
+
+  return tm.tm_wday ? tm.tm_wday : 7;
+}
+
+int crono_schedule_valid(const crono_schedule *cs) {
+  if (!valid_date(cs->f[crono_DAY].pos,
+                  cs->f[crono_MONTH].pos,
+                  cs->f[crono_YEAR].pos))
+    return 0;
+
+  int wday = week_day(cs->f[crono_DAY].pos,
+                      cs->f[crono_MONTH].pos,
+                      cs->f[crono_YEAR].pos);
+
+  if (!(cs->f[crono_WEEK_DAY].set & BIT(wday)))
+    return 0;
+
+  return 1;
+}
+
+static int crono__schedule_prev_day(crono_schedule *cs) {
+  for (int i = 0; i < crono_DAY; i++) {
+    crono_field_reset(&cs->f[i]);
+    crono_field_prev(&cs->f[i]);
+  }
+  return crono__schedule_prev(cs, crono_DAY);
+}
+
+static int crono__schedule_next_day(crono_schedule *cs) {
+  for (int i = 0; i < crono_DAY; i++)
+    crono_field_reset(&cs->f[i]);
+  return crono__schedule_next(cs, crono_DAY);
+}
+
+int crono_schedule_prev_valid(crono_schedule *cs) {
+  crono_schedule_prev(cs);
+  while (!crono_schedule_valid(cs))
+    crono__schedule_prev_day(cs);
+}
+
+int crono_schedule_next_valid(crono_schedule *cs) {
+  crono_schedule_next(cs);
+  while (!crono_schedule_valid(cs))
+    crono__schedule_next_day(cs);
+}
+
 /* vim:ts=2:sw=2:sts=2:et:ft=c
  */

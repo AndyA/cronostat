@@ -61,6 +61,9 @@ static void init_schedule(crono_schedule *cs) {
   crono_field_add(&cs->f[crono_HOUR], 18);
   crono_field_add_range(&cs->f[crono_DAY], 1, 31, 1); // *
   crono_field_add_range(&cs->f[crono_MONTH], 1, 12, 1); // *
+  crono_field_add(&cs->f[crono_WEEK_DAY], 2);
+  crono_field_add(&cs->f[crono_WEEK_DAY], 3);
+  crono_field_add(&cs->f[crono_WEEK_DAY], 5);
 }
 
 static void test_schedule_get(void) {
@@ -133,10 +136,41 @@ static void test_schedule_set(void) {
   }
 }
 
+
+static void test_schedule_valid(void) {
+  crono_schedule cs;
+  struct tm tm;
+  time_t tt;
+
+  init_schedule(&cs);
+
+  tt = 1384351140;
+  gmtime_r(&tt, &tm);
+
+  {
+    crono_schedule_set(&cs, &tm);
+    is_schedule(&cs, 2013, 11, 13, 13, 59);
+
+    crono_schedule_next_valid(&cs);
+    is_schedule(&cs, 2013, 11, 16, 8, 0);
+    ok(crono_schedule_snapped(&cs), "snapped");
+  }
+
+  {
+    crono_schedule_set(&cs, &tm);
+    is_schedule(&cs, 2013, 11, 13, 13, 59);
+
+    crono_schedule_prev_valid(&cs);
+    is_schedule(&cs, 2013, 11, 12, 18, 50);
+    ok(crono_schedule_snapped(&cs), "snapped");
+  }
+}
+
 int main(void) {
   test_field();
   test_schedule_get();
   test_schedule_set();
+  test_schedule_valid();
   done_testing();
   return 0;
 }
