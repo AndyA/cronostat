@@ -222,11 +222,13 @@ static int week_day(int day, int month, int year) {
 }
 
 int crono_schedule_valid(const crono_schedule *cs) {
+  /* is date valid */
   if (!valid_date(cs->f[crono_DAY].pos,
                   cs->f[crono_MONTH].pos,
                   cs->f[crono_YEAR].pos))
     return 0;
 
+  /* filter by week day */
   int wday = week_day(cs->f[crono_DAY].pos,
                       cs->f[crono_MONTH].pos,
                       cs->f[crono_YEAR].pos);
