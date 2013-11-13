@@ -28,7 +28,6 @@ extern "C" {
 
   int crono_field_init(crono_field *cf, int min, int max);
   int crono_field_add(crono_field *cf, int pos);
-  int crono_field_remove(crono_field *cf, int pos);
   int crono_field_add_range(crono_field *cf, int min, int max, int step);
   int crono_field_size(const crono_field *cf);
   int crono_field_prev(crono_field *cf);
