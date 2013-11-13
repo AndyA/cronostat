@@ -26,6 +26,14 @@ extern "C" {
     crono_field f[crono_FIELDS];
   } crono_schedule;
 
+  typedef struct crono_rule {
+    crono_schedule s;
+    time_t tm; /* derived from schedule */
+    const char *action;
+    struct crono_rule *next;
+
+  } crono_rule;
+
   int crono_field_init(crono_field *cf, int min, int max);
   int crono_field_add(crono_field *cf, int pos);
   int crono_field_add_range(crono_field *cf, int min, int max, int step);
@@ -52,6 +60,8 @@ extern "C" {
   int crono_schedule_valid(const crono_schedule *cs);
   int crono_schedule_prev_valid(crono_schedule *cs);
   int crono_schedule_next_valid(crono_schedule *cs);
+
+  int crono_rule_parse(crono_rule *cr, const char *ent);
 
 #ifdef __cplusplus
 }

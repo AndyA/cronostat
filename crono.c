@@ -1,5 +1,7 @@
 /* crono.c */
 
+#include <stdlib.h>
+
 #include "crono.h"
 
 #define BIT(x) ((uint64_t) 1 << (x))
@@ -258,12 +260,14 @@ int crono_schedule_prev_valid(crono_schedule *cs) {
   crono_schedule_prev(cs);
   while (!crono_schedule_valid(cs))
     crono__schedule_prev_day(cs);
+  return 0;
 }
 
 int crono_schedule_next_valid(crono_schedule *cs) {
   crono_schedule_next(cs);
   while (!crono_schedule_valid(cs))
     crono__schedule_next_day(cs);
+  return 0;
 }
 
 /* vim:ts=2:sw=2:sts=2:et:ft=c
