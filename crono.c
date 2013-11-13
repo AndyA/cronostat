@@ -1,23 +1,6 @@
 /* crono.c */
 
-#include <stdio.h>
-#include <stdint.h>
-
-typedef struct {
-  uint64_t set;
-  int min, max;
-  int pos;
-} crono_field;
-
-enum {
-  crono_MINUTE, crono_HOUR, crono_DAY, crono_MONTH, crono_YEAR, /* iter */
-  crono_WEEK_DAY, /* filter */
-  crono_FIELDS
-};
-
-typedef struct {
-  crono_field f[crono_FIELDS];
-} crono_schedule;
+#include "crono.h"
 
 int crono_field_size(const crono_field *cf) {
   int size = 0;
@@ -93,46 +76,16 @@ int crono_schedule_next(crono_schedule *cs) {
   return 1;
 }
 
-int main(void) {
+int crono_schedule_get(const crono_schedule *cs, struct tm *tm) {
+  tm->tm_sec = 0;
+  tm->tm_min = cs->f[crono_MINUTE].pos;
+  tm->tm_hour = cs->f[crono_HOUR].pos;
+  tm->tm_mday = cs->f[crono_DAY].pos;
+  tm->tm_mon = cs->f[crono_MONTH].pos;
+  tm->tm_year = cs->f[crono_YEAR].pos;
+  tm->tm_isdst = -1;
   return 0;
 }
 
 /* vim:ts=2:sw=2:sts=2:et:ft=c
  */
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
