@@ -15,7 +15,7 @@ libcrono_la_SOURCES = \
 
 libcrono_la_LDFLAGS = -avoid-version
 
-crono_SOURCES = main.c
+crono_SOURCES = main.c utils.c
 crono_LDADD = libcrono.la
 
 test: all

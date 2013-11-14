@@ -381,7 +381,7 @@ int crono_rule_next(crono_rule *cr) {
   return crono__rule_synctime(cr);
 }
 
-crono_rule *crono__rule_add(crono_rule *list, crono_rule *cr) {
+crono_rule *crono__rule_insert(crono_rule *list, crono_rule *cr) {
   if (!list) return cr;
 
   if (cr->tm < list->tm) {
@@ -389,13 +389,27 @@ crono_rule *crono__rule_add(crono_rule *list, crono_rule *cr) {
     return cr;
   }
 
-  list->next = crono__rule_add(list->next, cr);
+  list->next = crono__rule_insert(list->next, cr);
   return list;
 }
 
-crono_rule *crono_rule_add(crono_rule *list, crono_rule *cr) {
+crono_rule *crono_rule_insert(crono_rule *list, crono_rule *cr) {
   crono__rule_synctime(cr); // redundant if crono_rule_{prev,next} was called
-  return crono__rule_add(list, cr);
+  return crono__rule_insert(list, cr);
+}
+
+crono_rule *crono_rule_trigger(crono_rule *list, time_t tm) {
+
+  while (list && list->tm <= tm) {
+    crono_rule *tail = list->next;
+    list->next = NULL;
+
+    list->action_cb(list->action_ctx, list->action, tm);
+    crono_rule_next(list);
+    list = crono__rule_insert(tail, list);
+  }
+
+  return list;
 }
 
 /* vim:ts=2:sw=2:sts=2:et:ft=c

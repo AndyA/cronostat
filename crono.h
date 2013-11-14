@@ -74,12 +74,13 @@ extern "C" {
   int crono_rule_init(crono_rule *cr);
   crono_rule *crono_rule_new(crono_action_cb cb, void *ctx);
   void crono_rule_free(crono_rule *cr);
-  crono_rule *crono_rule_add(crono_rule *list, crono_rule *cr);
+  crono_rule *crono_rule_insert(crono_rule *list, crono_rule *cr);
 
   int crono_rule_parse(crono_rule *cr, const char *ent);
   int crono_rule_parse_extended(crono_rule *cr, const char *ent);
   int crono_rule_prev(crono_rule *cr);
   int crono_rule_next(crono_rule *cr);
+  crono_rule *crono_rule_trigger(crono_rule *list, time_t tm);
 
 #ifdef __cplusplus
 }
