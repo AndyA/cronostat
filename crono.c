@@ -275,13 +275,17 @@ int crono_rule_init(crono_rule *cr) {
   cr->action = NULL;
   cr->next = NULL;
   cr->mktime_cb = mktime;
+  cr->action_ctx = NULL;
+  cr->action_cb = NULL;
   return 0;
 }
 
-crono_rule *crono_rule_new(void) {
+crono_rule *crono_rule_new(crono_action_cb cb, void *ctx) {
   crono_rule *cr = calloc(1, sizeof(*cr));
   if (!cr) return NULL;
   crono_rule_init(cr);
+  cr->action_ctx = ctx;
+  cr->action_cb = cb;
   return cr;
 }
 
