@@ -270,5 +270,116 @@ int crono_schedule_next_valid(crono_schedule *cs) {
   return 0;
 }
 
+int crono_rule_init(crono_rule *cr) {
+  crono_schedule_init(&cr->s);
+  cr->action = NULL;
+  cr->next = NULL;
+  cr->mktime_cb = mktime;
+  return 0;
+}
+
+crono_rule *crono_rule_new(void) {
+  crono_rule *cr = calloc(1, sizeof(*cr));
+  if (!cr) return NULL;
+  crono_rule_init(cr);
+  return cr;
+}
+
+void crono_rule_free(crono_rule *cr) {
+  if (cr) {
+    free(cr->action);
+    crono_rule_free(cr->next);
+    free(cr);
+  }
+}
+
+static int parse_field(crono_field *cf, const char *spec, char **sp) {
+  for (;;) {
+    int min, max, step = 1;
+
+    if (*spec == '*') {
+      min = cf->min;
+      max = cf->max;
+      *sp = spec + 1;
+    }
+    else {
+      min = max = (int) strtoul(spec, sp, 10);
+      if (*sp == spec) return -1;
+
+      if (**sp == '-') {
+        const char *ep = *sp + 1;
+        max = (int) strtoul(ep, sp, 10);
+        if (*sp == ep) return -1;
+      }
+    }
+
+    if (**sp == '/') {
+      const char *ep = *sp + 1;
+      step = (int) strtoul(ep, sp, 10);
+      if (*sp == ep) return -1;
+    }
+
+    if (crono_field_add_range(cf, min, max, step))
+      return -1;
+
+    if (**sp != ',') break;
+
+    spec = *sp + 1; /* round again */
+  }
+
+  return 0;
+}
+
+int crono_rule_parse(crono_rule *cr, const char *ent) {
+  char *sp;
+  for (int i = 0; i < crono_FIELDS; i++) {
+    if (i == crono_YEAR) continue; /* no year field */
+    if (parse_field(&cr->s.f[i], ent, &sp))
+      return -1;
+    while (isspace(*sp)) sp++;
+    ent = sp;
+  }
+  cr->action = strdup(ent);
+  if (!cr->action) return -1;
+  return 0;
+}
+
+static int crono__rule_synctime(crono_rule *cr) {
+  struct tm tm;
+  time_t t;
+  if (crono_schedule_get(&cr->s, &tm)) return -1;
+  t = cr->mktime_cb(&tm);
+  if (t == (time_t) - 1) return -1;
+  cr->tm = t;
+  return 0;
+}
+
+int crono_rule_prev(crono_rule *cr) {
+  if (crono_schedule_prev_valid(&cr->s)) return -1;
+  return crono__rule_synctime(cr);
+}
+
+int crono_rule_next(crono_rule *cr) {
+  if (crono_schedule_next_valid(&cr->s)) return -1;
+  return crono__rule_synctime(cr);
+}
+
+crono_rule *crono__rule_add(crono_rule *list, crono_rule *cr) {
+  if (!list) return cr;
+
+  if (cr->tm < list->tm) {
+    cr->next = list;
+    return cr;
+  }
+
+  list->next = crono__rule_add(list->next, cr);
+  return list;
+}
+
+crono_rule *crono_rule_add(crono_rule *list, crono_rule *cr) {
+  crono__rule_synctime(cr); // redundant if crono_rule_{prev,next} was called
+  return crono__rule_add(list, cr);
+}
+
 /* vim:ts=2:sw=2:sts=2:et:ft=c
  */

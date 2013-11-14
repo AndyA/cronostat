@@ -6,8 +6,7 @@
 static void test_parse(void) {
   crono_rule cr;
 
-  cr.action = NULL;
-  crono_schedule_init(&cr.s);
+  crono_rule_init(&cr);
 
   int rc = crono_rule_parse(&cr, "* * * * * t1");
   ok(rc == 0, "parse OK");
