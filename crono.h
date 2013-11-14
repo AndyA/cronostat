@@ -17,6 +17,7 @@ extern "C" {
   } crono_field;
 
   enum {
+    crono_SECOND, /* optional */
     crono_MINUTE, crono_HOUR, crono_DAY, crono_MONTH, crono_YEAR, /* iter */
     crono_WEEK_DAY, /* filter */
     crono_FIELDS
@@ -76,6 +77,7 @@ extern "C" {
   crono_rule *crono_rule_add(crono_rule *list, crono_rule *cr);
 
   int crono_rule_parse(crono_rule *cr, const char *ent);
+  int crono_rule_parse_extended(crono_rule *cr, const char *ent);
   int crono_rule_prev(crono_rule *cr);
   int crono_rule_next(crono_rule *cr);
 

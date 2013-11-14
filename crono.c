@@ -108,12 +108,14 @@ int crono_field_reset(crono_field *cf) {
 }
 
 int crono_schedule_init(crono_schedule *cs) {
+  crono_field_init(&cs->f[crono_SECOND], 0, 59);
   crono_field_init(&cs->f[crono_MINUTE], 0, 59);
   crono_field_init(&cs->f[crono_HOUR], 0, 23);
   crono_field_init(&cs->f[crono_DAY], 1, 31);
   crono_field_init(&cs->f[crono_MONTH], 1, 12);
   crono_field_init(&cs->f[crono_YEAR], 0, 0);
   crono_field_init(&cs->f[crono_WEEK_DAY], 1, 7);
+
   return 0;
 }
 
@@ -134,7 +136,7 @@ static int crono__schedule_next(crono_schedule *cs, int fp) {
 }
 
 int crono_schedule_get(const crono_schedule *cs, struct tm *tm) {
-  tm->tm_sec = 0;
+  tm->tm_sec = cs->f[crono_SECOND].pos;
   tm->tm_min = cs->f[crono_MINUTE].pos;
   tm->tm_hour = cs->f[crono_HOUR].pos;
   tm->tm_mday = cs->f[crono_DAY].pos;
@@ -145,6 +147,7 @@ int crono_schedule_get(const crono_schedule *cs, struct tm *tm) {
 }
 
 int crono_schedule_set(crono_schedule *cs, const struct tm *tm) {
+  cs->f[crono_SECOND].pos = tm->tm_sec;
   cs->f[crono_MINUTE].pos = tm->tm_min;
   cs->f[crono_HOUR].pos = tm->tm_hour;
   cs->f[crono_DAY].pos = tm->tm_mday;
@@ -334,9 +337,11 @@ static int parse_field(crono_field *cf, const char *spec, char **sp) {
   return 0;
 }
 
-int crono_rule_parse(crono_rule *cr, const char *ent) {
+static int rule_parse(crono_rule *cr, const char *ent, int from) {
   char *sp;
-  for (int i = 0; i < crono_FIELDS; i++) {
+  for (int i = crono_SECOND; i < from; i++)
+    crono_field_add(&cr->s.f[i], 0);
+  for (int i = from; i < crono_FIELDS; i++) {
     if (i == crono_YEAR) continue; /* no year field */
     if (parse_field(&cr->s.f[i], ent, &sp))
       return -1;
@@ -346,6 +351,14 @@ int crono_rule_parse(crono_rule *cr, const char *ent) {
   cr->action = strdup(ent);
   if (!cr->action) return -1;
   return 0;
+}
+
+int crono_rule_parse(crono_rule *cr, const char *ent) {
+  return rule_parse(cr, ent, crono_MINUTE);
+}
+
+int crono_rule_parse_extended(crono_rule *cr, const char *ent) {
+  return rule_parse(cr, ent, crono_SECOND);
 }
 
 static int crono__rule_synctime(crono_rule *cr) {

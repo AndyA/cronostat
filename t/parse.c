@@ -10,6 +10,8 @@ static void test_parse(void) {
 
   int rc = crono_rule_parse(&cr, "* * * * * t1");
   ok(rc == 0, "parse OK");
+  rc = crono_rule_parse_extended(&cr, "* * * * * * t1");
+  ok(rc == 0, "parse OK (extended)");
 }
 
 int main(void) {

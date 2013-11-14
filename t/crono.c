@@ -55,6 +55,7 @@ static void test_field(void) {
 static void init_schedule(crono_schedule *cs) {
   crono_schedule_init(cs);
 
+  crono_field_add(&cs->f[crono_SECOND], 0);
   crono_field_add_range(&cs->f[crono_MINUTE], 0, 59, 10); // */10
   crono_field_add(&cs->f[crono_HOUR], 8);
   crono_field_add(&cs->f[crono_HOUR], 12);
@@ -72,6 +73,7 @@ static void test_schedule_get(void) {
 
   init_schedule(&cs);
 
+  cs.f[crono_SECOND].pos = 0;
   cs.f[crono_MINUTE].pos = 59;
   cs.f[crono_HOUR].pos = 13;
   cs.f[crono_DAY].pos = 13;
@@ -81,26 +83,31 @@ static void test_schedule_get(void) {
   crono_schedule_get(&cs, &tm);
   time_t tt = _timegm(&tm);
 
-  is(tt, 1384351140, "time set");
+  if (!is(tt, 1384351140, "time set"))
+    diag("wanted 1384351140, got %ld", (long) tt);
 }
 
 static int is_schedule(const crono_schedule *cs,
                        int year, int month, int day,
-                       int hour, int minute) {
+                       int hour, int minute, int second) {
   int tst = cs->f[crono_YEAR].pos == year &&
             cs->f[crono_MONTH].pos == month &&
             cs->f[crono_DAY].pos == day &&
             cs->f[crono_HOUR].pos == hour &&
-            cs->f[crono_MINUTE].pos == minute;
-  ok(tst, "schedule: %04d/%02d/%02d %02d:%02d", year, month, day, hour, minute);
+            cs->f[crono_MINUTE].pos == minute &&
+            cs->f[crono_SECOND].pos == second;
+  ok(tst, "schedule: %04d/%02d/%02d %02d:%02d:%02d",
+     year, month, day, hour, minute, second);
   if (!tst) {
-    diag("wanted: %04d/%02d/%02d %02d:%02d", year, month, day, hour, minute);
-    diag("   got: %04d/%02d/%02d %02d:%02d",
+    diag("wanted: %04d/%02d/%02d %02d:%02d:%02d",
+         year, month, day, hour, minute, second);
+    diag("   got: %04d/%02d/%02d %02d:%02d:%02d",
          cs->f[crono_YEAR].pos,
          cs->f[crono_MONTH].pos,
          cs->f[crono_DAY].pos,
          cs->f[crono_HOUR].pos,
-         cs->f[crono_MINUTE].pos);
+         cs->f[crono_MINUTE].pos,
+         cs->f[crono_SECOND].pos);
   }
   return tst;
 }
@@ -117,21 +124,21 @@ static void test_schedule_set(void) {
 
   {
     crono_schedule_set(&cs, &tm);
-    is_schedule(&cs, 2013, 11, 13, 13, 59);
+    is_schedule(&cs, 2013, 11, 13, 13, 59, 0);
     ok(!crono_schedule_snapped(&cs), "not snapped");
 
     crono_schedule_snap_prev(&cs);
-    is_schedule(&cs, 2013, 11, 13, 12, 50);
+    is_schedule(&cs, 2013, 11, 13, 12, 50, 0);
     ok(crono_schedule_snapped(&cs), "snapped");
   }
 
   {
     crono_schedule_set(&cs, &tm);
-    is_schedule(&cs, 2013, 11, 13, 13, 59);
+    is_schedule(&cs, 2013, 11, 13, 13, 59, 0);
     ok(!crono_schedule_snapped(&cs), "not snapped");
 
     crono_schedule_snap_next(&cs);
-    is_schedule(&cs, 2013, 11, 13, 18, 0);
+    is_schedule(&cs, 2013, 11, 13, 18, 0, 0);
     ok(crono_schedule_snapped(&cs), "snapped");
   }
 }
@@ -149,19 +156,19 @@ static void test_schedule_valid(void) {
 
   {
     crono_schedule_set(&cs, &tm);
-    is_schedule(&cs, 2013, 11, 13, 13, 59);
+    is_schedule(&cs, 2013, 11, 13, 13, 59, 0);
 
     crono_schedule_next_valid(&cs);
-    is_schedule(&cs, 2013, 11, 16, 8, 0);
+    is_schedule(&cs, 2013, 11, 16, 8, 0, 0);
     ok(crono_schedule_snapped(&cs), "snapped");
   }
 
   {
     crono_schedule_set(&cs, &tm);
-    is_schedule(&cs, 2013, 11, 13, 13, 59);
+    is_schedule(&cs, 2013, 11, 13, 13, 59, 0);
 
     crono_schedule_prev_valid(&cs);
-    is_schedule(&cs, 2013, 11, 12, 18, 50);
+    is_schedule(&cs, 2013, 11, 12, 18, 50, 0);
     ok(crono_schedule_snapped(&cs), "snapped");
   }
 }
