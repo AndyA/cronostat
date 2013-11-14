@@ -137,6 +137,8 @@ int main(int argc, char *argv[]) {
     sleep(snooze);
   }
 
+  // keep compiler happy
+  if (0) dump_rules(rules);
   crono_rule_free(rules);
   return 0;
 }

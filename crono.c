@@ -1,6 +1,8 @@
 /* crono.c */
 
 #include <stdlib.h>
+#include <ctype.h> // for isspace() et.al.
+#include <string.h> // for strdup() et.al.
 
 #include "crono.h"
 
@@ -294,7 +296,7 @@ crono_rule *crono_rule_new(crono_action_cb cb, void *ctx) {
 
 void crono_rule_free(crono_rule *cr) {
   if (cr) {
-    free(cr->action);
+    free((void*)cr->action);
     crono_rule_free(cr->next);
     free(cr);
   }
@@ -307,7 +309,7 @@ static int parse_field(crono_field *cf, const char *spec, char **sp) {
     if (*spec == '*') {
       min = cf->min;
       max = cf->max;
-      *sp = spec + 1;
+      *sp = (char *)spec + 1;
     }
     else {
       min = max = (int) strtoul(spec, sp, 10);
