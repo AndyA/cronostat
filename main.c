@@ -133,8 +133,10 @@ int main(int argc, char *argv[]) {
     dump_temp(temp, CHANNELS);
 
     unsigned snooze = rules->tm - now;
-    printf("(sleeping for %u seconds)\n", snooze);
-    sleep(snooze);
+    if (snooze > 0) {
+      printf("(sleeping for %u seconds)\n", snooze);
+      sleep(snooze);
+    }
   }
 
   // keep compiler happy
