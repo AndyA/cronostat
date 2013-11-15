@@ -296,7 +296,7 @@ crono_rule *crono_rule_new(crono_action_cb cb, void *ctx) {
 
 void crono_rule_free(crono_rule *cr) {
   if (cr) {
-    free((void *)cr->action);
+    free((void*)cr->action);
     crono_rule_free(cr->next);
     free(cr);
   }
@@ -304,18 +304,12 @@ void crono_rule_free(crono_rule *cr) {
 
 static int parse_field(crono_field *cf, const char *spec, char **sp) {
   for (;;) {
-    int min, max, step = 1, phase = 0;
+    int min, max, step = 1;
 
     if (*spec == '*') {
       min = cf->min;
       max = cf->max;
       *sp = (char *)spec + 1;
-
-      if (**sp == '+' || **sp == '-') { // extension: shift phase
-        char *ep = *sp;
-        phase = (int) strtol(ep, sp, 10);
-        if (*sp == ep) return -1;
-      }
     }
     else {
       min = max = (int) strtoul(spec, sp, 10);
@@ -333,9 +327,6 @@ static int parse_field(crono_field *cf, const char *spec, char **sp) {
       step = (int) strtoul(ep, sp, 10);
       if (*sp == ep) return -1;
     }
-
-    if (phase >= step || phase <= -step) return -1;
-    min += (phase + step) % step;
 
     if (crono_field_add_range(cf, min, max, step))
       return -1;
