@@ -60,6 +60,8 @@ static crono_rule *read_file(crono_rule *rules, FILE *ct, struct tm *tm) {
     if (*lp == '\0' || *lp == '#') continue;
 
     crono_rule *cr = crono_rule_new(action, NULL);
+    if (!cr)
+      die("Can't allocate rule");
     if (crono_rule_parse(cr, lp))
       die("Can't parse %s", lbuf);
 
