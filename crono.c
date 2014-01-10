@@ -296,7 +296,7 @@ crono_rule *crono_rule_new(crono_action_cb cb, void *ctx) {
 
 void crono_rule_free(crono_rule *cr) {
   if (cr) {
-    free((void*)cr->action);
+    free((void *)cr->action);
     crono_rule_free(cr->next);
     free(cr);
   }
